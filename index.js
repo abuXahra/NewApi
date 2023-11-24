@@ -17,7 +17,7 @@ const postsRoute = require('./routes/posts')
 // middlewares
 dotenv.config();
 app.use(express.json())
-app.use("images", express.static(path.join(__dirname, "/images"))) //for image upload url
+app.use("/images", express.static(path.join(__dirname, "images"))) //for image upload url
 app.use(cors({ origin: "http://localhost:3000", credentials: true })) //to syncronize front and backenth
 app.use(cookieParser())
 
