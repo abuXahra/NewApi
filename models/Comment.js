@@ -5,9 +5,17 @@ const CommentSchema = new mongoose.Schema({
         type: String,
         require: true,
     },
+    email: {
+        type: String,
+        require: true
+    },
     author: {
         type: String,
         require: true,
+    },
+    website: {
+        type: String,
+        require: false
     },
     postId: {
         type: String,
@@ -15,7 +23,7 @@ const CommentSchema = new mongoose.Schema({
     },
     userId: {
         type: String,
-        required: true
+        required: false
     },
 }, { timestamps: true });
 

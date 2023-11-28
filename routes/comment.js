@@ -7,7 +7,7 @@ const verifyToken = require("../verifyToken")
 
 
 // ================COMMENT ROUTES============ //
-router.post('/', verifyToken, async (req, res) => {
+router.post('/create', verifyToken, async (req, res) => {
     try {
         const newComment = new Comment(req.body)
         const savedComment = await newComment.save()
@@ -55,7 +55,15 @@ router.get('/', async (req, res) => {
 })
 
 
-
+//GET POST DETAIL
+router.get('/:id', async (req, res) => {
+    try {
+        const comment = await Comment.findById(req.params.id)
+        res.status(200).json(comment)
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
 
 //GET POSTS COMMENTS
 router.get('/post/post:Id', async (req, res) => {
