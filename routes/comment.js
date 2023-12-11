@@ -6,7 +6,7 @@ const Comment = require("../models/Comment")
 const verifyToken = require("../verifyToken")
 
 
-// ================COMMENT ROUTES============ //
+//================COMMENT ROUTES============ //
 router.post('/create', verifyToken, async (req, res) => {
     try {
         const newComment = new Comment(req.body)
@@ -16,6 +16,26 @@ router.post('/create', verifyToken, async (req, res) => {
         res.status(500).json(err)
     }
 })
+
+
+
+
+// // ================COMMENT ROUTES============ //
+// router.post(':postId/comment', verifyToken, async (req, res) => {
+//     try {
+//         const postId = req.params.postId;
+//         const post = await Post.findById(postId)
+//         if (!post) {
+//             return res.status(404).json({ message: 'Post not found' })
+//         }
+//         const newComment = new Comment(req.body)
+//         post.comment.push(newComment)
+//         post.save()
+//         res.status(200).json(post);
+//     } catch (err) {
+//         res.status(500).json(err)
+//     }
+// })
 
 
 
@@ -33,7 +53,7 @@ router.put('/:id', verifyToken, async (req, res) => {
 
 
 //DELETE
-router.delete('/:id', verifyToken, async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         await Comment.findByIdAndDelete(req.params.id)
         res.status(200).json('Post has been deleted')
@@ -55,15 +75,15 @@ router.get('/', async (req, res) => {
 })
 
 
-//GET POST DETAIL
-router.get('/:id', async (req, res) => {
-    try {
-        const comment = await Comment.findById(req.params.id)
-        res.status(200).json(comment)
-    } catch (err) {
-        res.status(500).json(err);
-    }
-})
+// //GET POST DETAIL
+// router.get('/:id', async (req, res) => {
+//     try {
+//         const comment = await Comment.findById(req.params.id)
+//         res.status(200).json(comment)
+//     } catch (err) {
+//         res.status(500).json(err);
+//     }
+// })
 
 //GET POSTS COMMENTS
 router.get('/post/post:Id', async (req, res) => {

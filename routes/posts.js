@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router()
 const Post = require("../models/Post")
 const verifyToken = require("../verifyToken")
+const Comment = require('../models/Comment')
 
 
 // ================POST ROUTES============
@@ -49,7 +50,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
 
 
 
-// GET & SEARCH POSTS
+// GET & SEARCH POSTS WITH THEIR COMMENTS
 router.get('/', async (req, res) => {
     const query = req.query
     try {
@@ -57,7 +58,7 @@ router.get('/', async (req, res) => {
         const searchFilter = {
             title: { $regex: query.search, $options: "i" }, // $options: "i" it will search irrespective of the sentences case
         }
-        const posts = await Post.find(query.search ? searchFilter : null).sort({ createdAt: -1 });
+        const posts = await Post.find(query.search ? searchFilter : null).populate('comments').sort({ createdAt: -1 });
         res.status(200).json(posts)
     } catch (err) {
         res.status(500).json(err);
@@ -65,6 +66,15 @@ router.get('/', async (req, res) => {
 })
 
 
+// // Get all posts with their comments
+// router.get('/', async (req, res) => {
+//     try {
+//         const posts = await Post.find().populate('comments'); // Populate comments for each post
+//         res.json(posts);
+//     } catch (err) {
+//         res.status(500).json({ message: err.message });
+//     }
+// });
 
 
 //GET POST DETAIL
@@ -90,6 +100,67 @@ router.get("/user/:userId", async (req, res) => {
     }
 })
 
+
+
+
+// Create a new post comment
+
+
+// Add a comment to a specific post
+router.post('/:postId/comment', async (req, res) => {
+    try {
+        const { postId } = req.params;
+        const { comment, email, author, website, userId } = req.body;
+
+        const newComment = await Comment.create({ comment, email, author, website, postId, userId });
+
+        // Push the new comment to the associated post
+        await Post.findByIdAndUpdate(postId, { $push: { comments: newComment._id } });
+
+        res.status(201).json(newComment);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+
+
+
+// Get comments for a specific post
+router.get('/:postId/comments', async (req, res) => {
+    try {
+        const comments = await Comment.find({ postId: req.params.postId });
+        res.json(comments);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+
+
+
+// Delete a comment
+router.delete('/:postId/comment/:commentId', async (req, res) => {
+    try {
+        const deletedComment = await Comment.findByIdAndDelete(req.params.commentId);
+        if (!deletedComment) {
+            return res.status(404).json({ message: 'Comment not found' });
+        }
+        res.json({ message: 'Comment deleted successfully' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+
+
+
+
+
+
+// get a new post comment
 
 
 // //GET POST CATEGORIES
