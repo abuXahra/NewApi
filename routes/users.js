@@ -39,15 +39,26 @@ route.delete('/:id', verifyToken, async (req, res) => {
 
 
 //GET SINGLE USER
-route.get('/:id', async (req, res) => {
+route.get('/:userId', async (req, res) => {
     try {
-        const user = await User.findById(req.params.id)
-        const { password, ...info } = user._doc //to remove the password for the get result
-        res.status(200).json(info)
-    } catch (err) {
-        res.status(500).json(err);
+        const userId = req.params.userId;
+        const user = await User.findById(userId); // Retrieve user from MongoDB by ID
+        res.json(user); // Send user data as JSON response
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-})
+});
+
+
+// route.get('/:id', async (req, res) => {
+//     try {
+//         const user = await User.findById(req.params.id)
+//         const { password, ...info } = user._doc //to remove the password for the get result
+//         res.status(200).json(info)
+//     } catch (err) {
+//         res.status(500).json(err);
+//     }
+// })
 
 
 //GET ALL USERS
@@ -59,6 +70,11 @@ route.get('/', async (req, res) => {
         res.status(500).json(err);
     }
 })
+
+
+
+
+
 
 
 //2: 08: 27
