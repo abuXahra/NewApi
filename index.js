@@ -10,6 +10,7 @@ const authRoute = require('./routes/auth')
 const userRoute = require('./routes/users')
 const commentRoute = require('./routes/comment')
 const postsRoute = require('./routes/posts')
+const categoryRoute = require('./routes/category')
 
 
 
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoute)
 app.use('/api/users', userRoute)
 app.use('/api/posts', postsRoute)
 app.use('/api/comments', commentRoute)
+app.use('/api/categories', categoryRoute)
 
 
 // Image upload route

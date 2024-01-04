@@ -3,37 +3,95 @@ const router = express.Router()
 const Post = require("../models/Post")
 const verifyToken = require("../verifyToken")
 const Comment = require('../models/Comment')
+const Category = require('../models/Category')
 
 
 // ================POST ROUTES============
 
 
+// CREATE
+// router.post('/create', verifyToken, async (req, res) => {
+//     try {
+//         const newPost = new Post(req.body)
+//         const savedPost = await newPost.save()
+//         res.status(200).json(savedPost);
+//     } catch (err) {
+//         res.status(500).json(err)
+//     }
+// })
 
 
 // CREATE
-router.post('/create', verifyToken, async (req, res) => {
+router.post('/create', async (req, res) => {
     try {
 
-        const newPost = new Post(req.body)
-        const savedPost = await newPost.save()
-        res.status(200).json(savedPost);
+        const { title, desc, photo, username, userId, categories } = req.body;
+
+        // Create the post with the provided category
+        const newPost = new Post({
+            title,
+            desc,
+            photo,
+            username,
+            userId,
+            categories
+        });
+
+        await newPost.save();
+        res.status(200).json(newPost);
     } catch (err) {
-        res.status(500).json(err)
+        res.status(500).json({ message: err.message });
     }
-})
+});
+
 
 
 
 //UPDATE
+// router.put('/:id', verifyToken, async (req, res) => {
+//     try {
+
+//         const updatedPost = await Post.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
+//         res.status(200).json(updatedPost);
+
+//     } catch (err) {
+//         res.status(500).json(err)
+//     }
+// })
+
+
 router.put('/:id', verifyToken, async (req, res) => {
     try {
-        const updatedPost = await Post.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
-        res.status(200).json(updatedPost);
+        const postId = req.params.id;
+        const { title, desc, photo, username, userId, categories } = req.body;
 
-    } catch (err) {
-        res.status(500).json(err)
+        const existingPost = await Post.findById(postId);
+
+        if (!existingPost) {
+            return res.status(404).json({ error: 'Blog post not found' });
+        }
+
+        // Check for existing categories in the post, avoid duplicates
+        const uniqueCategories = categories.filter((category) => (
+            !existingPost.categories.includes(category)
+        ));
+
+        // Update the post with the unique categories
+        existingPost.title = title;
+        existingPost.desc = desc;
+        existingPost.photo = photo;
+        existingPost.username = username;
+        existingPost.userId = userId;
+        existingPost.categories.push(...uniqueCategories);
+        await existingPost.save();
+
+        res.status(200).json(existingPost);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
-})
+});
+
+
 
 
 //DELETE
@@ -58,7 +116,7 @@ router.get('/', async (req, res) => {
         const searchFilter = {
             title: { $regex: query.search, $options: "i" }, // $options: "i" it will search irrespective of the sentences case
         }
-        const posts = await Post.find(query.search ? searchFilter : null).populate('comments').sort({ createdAt: -1 });
+        const posts = await Post.find(query.search ? searchFilter : null).populate('comments').sort({ createdAt: -1 }).limit(8); //lmit(8) to display only 8 posts
         res.status(200).json(posts)
     } catch (err) {
         res.status(500).json(err);
@@ -88,11 +146,10 @@ router.get('/:id', async (req, res) => {
 })
 
 
-
 //GET USER POSTS 
 router.get("/user/:userId", async (req, res) => {
     try {
-        const posts = await Post.find({ userId: req.params.userId })
+        const posts = await Post.find({ userId: req.params.userId }).populate('comments').sort({ createdAt: -1 })
         res.status(200).json(posts)
     } catch (err) {
         res.status(500).json(err);
@@ -103,8 +160,6 @@ router.get("/user/:userId", async (req, res) => {
 
 
 // Create a new post comment
-
-
 // Add a comment to a specific post
 router.post('/:postId/comment', async (req, res) => {
     try {
@@ -159,7 +214,6 @@ router.delete('/:postId/comment/:commentId', async (req, res) => {
 
 
 
-// get a new post comment
 
 
 // //GET POST CATEGORIES
@@ -178,5 +232,4 @@ router.delete('/:postId/comment/:commentId', async (req, res) => {
 
 
 
-//2: 08: 27
 module.exports = router;

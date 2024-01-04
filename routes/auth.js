@@ -27,7 +27,7 @@ router.post('/login', async (req, res) => {
         if (!user) {
             return res.status(404).json("User not found")
         }
-        const match = await bcrypt.compare(req.body.password, user.password)
+        const match = bcrypt.compare(req.body.password, user.password)
         if (!match) {
             return res.status(401).json('Wrong Credentials')
         }
