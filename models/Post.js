@@ -25,7 +25,7 @@ const PostSchema = new mongoose.Schema({
     },
     categories: [
         {
-            type: mongoose.Schema.Types.String,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "Category"
         }
     ],

@@ -1,11 +1,13 @@
 const express = require("express")
 const app = express();
 const mongoose = require('mongoose');
+
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const multer = require('multer')
 const path = require('path')
+
 const authRoute = require('./routes/auth')
 const userRoute = require('./routes/users')
 const commentRoute = require('./routes/comment')
@@ -19,7 +21,7 @@ const categoryRoute = require('./routes/category')
 dotenv.config();
 app.use(express.json())
 app.use("/images", express.static(path.join(__dirname, "images"))) //for image upload url
-app.use(cors({ origin: "http://localhost:3000", credentials: true })) //to syncronize front and backenth
+app.use(cors({ origin: ["http://localhost:3000", "https://pblog.onrender.com"], credentials: true })) //to syncronize front and backenth
 app.use(cookieParser())
 
 

@@ -138,7 +138,7 @@ router.get('/', async (req, res) => {
 //GET POST DETAIL
 router.get('/:id', async (req, res) => {
     try {
-        const post = await Post.findById(req.params.id)
+        const post = await Post.findById(req.params.id).populate('categories')
         res.status(200).json(post)
     } catch (err) {
         res.status(500).json(err);
@@ -149,7 +149,9 @@ router.get('/:id', async (req, res) => {
 //GET USER POSTS 
 router.get("/user/:userId", async (req, res) => {
     try {
-        const posts = await Post.find({ userId: req.params.userId }).populate('comments').sort({ createdAt: -1 })
+        const posts = await Post.find({ userId: req.params.userId })
+            .populate('categories')
+            .populate('comments').sort({ createdAt: -1 })
         res.status(200).json(posts)
     } catch (err) {
         res.status(500).json(err);
